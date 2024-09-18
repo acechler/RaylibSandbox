@@ -1,138 +1,108 @@
-#include "raylib.h"
+#include <iostream>
 #include <vector>
-#include <algorithm>
+#include <cmath>
+#include "raylib.h"
 
-// Enum to select sorting algorithm
-enum SortingAlgorithm { BUBBLE_SORT, SELECTION_SORT };
+struct Pixel {
+	int x;
+	int y;
+};
 
-// Function to perform a single pass of bubble sort
-bool BubbleSortStep(std::vector<int>& array, int& i, int& j) {
-    if (i < array.size() - 1) {
-        if (j < array.size() - i - 1) {
-            if (array[j] > array[j + 1]) {
-                std::swap(array[j], array[j + 1]);
-            }
-            j++;
-        }
-        else {
-            j = 0;
-            i++;
-        }
-        return false; // Sorting not finished yet
-    }
-    return true; // Sorting finished
+
+void UpdateAndDrawPixels(std::vector<Pixel>& pixels,
+	float time, float amplitude, float movementSpeed, float periodicTime, int index)
+{
+	if (index >= pixels.size())
+		return;
+
+	pixels[index].y = 225 + amplitude * tanf((pixels[index].x + time * movementSpeed) * periodicTime);
+
+	DrawPixel(pixels[index].x, pixels[index].y, RED);;
+
+	UpdateAndDrawPixels(pixels, time, amplitude, movementSpeed, periodicTime, index + 1);
 }
 
-// Function to perform a single pass of selection sort
-bool SelectionSortStep(std::vector<int>& array, int& i, int& j, int& minIndex) {
-    if (i < array.size() - 1) {
-        if (j < array.size()) {
-            if (array[j] < array[minIndex]) {
-                minIndex = j;
-            }
-            j++;
-        }
-        else {
-            std::swap(array[i], array[minIndex]);
-            i++;
-            j = i + 1;
-            minIndex = i;
-        }
-        return false; // Sorting not finished yet
-    }
-    return true; // Sorting finished
+void UpdateAndDrawPixels(std::vector<Pixel>& pixels, std::vector<Pixel>& pixels2,
+	float time, float amplitude, float movementSpeed, float periodicTime, int index)
+{
+	if (index >= pixels.size())
+		return;
+
+	pixels[index].y = 225 + amplitude * sinf((pixels[index].x + time * movementSpeed) * periodicTime + acoshf(2) * index);
+	pixels2[index].y = 225 + amplitude * sinf((pixels2[index].x + time * movementSpeed) * periodicTime + asinhf(2) * index);
+
+	DrawPixel(pixels[index].x, pixels[index].y, RED);
+	DrawPixel(pixels2[index].x, pixels2[index].y, BLUE);
+
+	UpdateAndDrawPixels(pixels, pixels2, time, amplitude, movementSpeed, periodicTime, index + 1);
 }
 
-// Function to generate a new random array
-void GenerateRandomArray(std::vector<int>& array, int screenHeight) {
-    for (int i = 0; i < array.size(); i++) {
-        array[i] = GetRandomValue(10, screenHeight - 10); // Values between 10 and screenHeight - 10
-    }
+void UpdateAndDrawPixels(std::vector<Pixel>& pixels, std::vector<Pixel>& pixels2, std::vector<Pixel>& pixels3, 
+	float time, float amplitude, float movementSpeed, float periodicTime, int index)
+{
+	if (index >= pixels.size())
+		return;
+
+	pixels[index].y = 225 + amplitude * sinf((pixels[index].x + time * movementSpeed) * periodicTime + sinf(2) * index);
+	pixels2[index].y = 225 + amplitude * cosf((pixels2[index].x + time * movementSpeed) * periodicTime + cosf(2) * index);
+	pixels3[index].y = 225 + amplitude * tanf((pixels3[index].x + time * movementSpeed) * periodicTime + tanf(2) * index);
+
+
+	DrawPixel(pixels[index].x, pixels[index].y, RED);
+	DrawPixel(pixels2[index].x, pixels2[index].y, BLUE);
+	DrawPixel(pixels3[index].x, pixels3[index].y, GREEN);
+
+
+	UpdateAndDrawPixels(pixels, pixels2,pixels3, time, amplitude, movementSpeed, periodicTime, index + 1);
 }
 
-int main() {
-    // Initialize the window
-    const int screenWidth = 800;
-    const int screenHeight = 600;
-    InitWindow(screenWidth, screenHeight, "Sorting Algorithm Visualization");
 
-    // Generate a random array of integers
-    int arraySize = 20;
-    std::vector<int> array(arraySize);
-    GenerateRandomArray(array, screenHeight);
+int main(void)
+{
+	const int screenWidth = 800;
+	const int screenHeight = 450;
 
-    int i = 0; // Current index of the outer loop
-    int j = 0; // Current index of the inner loop
-    int minIndex = 0; // Index of the minimum element for selection sort
-    bool sorted = false; // Flag to check if sorting is done
-    bool sortingPaused = true; // Flag to pause/resume sorting
+	InitWindow(screenWidth, screenHeight, "raylib [core] example - wave pattern");
 
-    SortingAlgorithm currentAlgorithm = BUBBLE_SORT; // Default to BubbleSort
+	SetTargetFPS(120);  // Set our game to run at 120 frames-per-second
 
-    // Set the target FPS
-    SetTargetFPS(60);
+	float time = 0.0f;
+	float amplitude = 100.0f;
+	float movementSpeed = 2.0f;
+	float periodicTime = 0.04f;
+	int pixelSpace = 1;
 
-    // Main game loop
-    while (!WindowShouldClose()) {
-        // Toggle sorting algorithm with key press
-        if (IsKeyPressed(KEY_ONE)) {
-            currentAlgorithm = BUBBLE_SORT;
-            i = 0; j = 0; sorted = false; sortingPaused = true;
-        }
-        if (IsKeyPressed(KEY_TWO)) {
-            currentAlgorithm = SELECTION_SORT;
-            i = 0; j = 1; minIndex = 0; sorted = false; sortingPaused = true;
-        }
 
-        // Toggle pause/resume with spacebar
-        if (IsKeyPressed(KEY_SPACE)) {
-            sortingPaused = !sortingPaused;
-        }
+	std::vector<Pixel> pixels;
+	std::vector<Pixel> pixels2;
+	std::vector<Pixel> pixels3;
+	// Initialize pixel positions
+	for (int x = 0; x < screenWidth; x += pixelSpace)
+	{
+		pixels.push_back({ x, screenHeight / 2 });
+		pixels2.push_back({ x, screenHeight / 2 });
+		pixels3.push_back({ x,screenHeight / 2 });
+	}
 
-        // Refill array with new random values with R key
-        if (IsKeyPressed(KEY_R)) {
-            GenerateRandomArray(array, screenHeight);
-            i = 0; j = (currentAlgorithm == SELECTION_SORT) ? 1 : 0; minIndex = 0;
-            sorted = false; sortingPaused = true;
-        }
+	// Main game loop
+	while (!WindowShouldClose())  // Detect window close button or ESC key
+	{
+		time += GetFrameTime();  // Update time
 
-        // Update only if sorting is not paused and not finished
-        if (!sortingPaused && !sorted) {
-            if (currentAlgorithm == BUBBLE_SORT) {
-                sorted = BubbleSortStep(array, i, j);
-            }
-            else if (currentAlgorithm == SELECTION_SORT) {
-                sorted = SelectionSortStep(array, i, j, minIndex);
-            }
-        }
+		BeginDrawing();
 
-        // Start drawing
-        BeginDrawing();
-        ClearBackground(RAYWHITE);
+		ClearBackground(BLACK);
 
-        // Draw the array as a series of rectangles
-        for (int k = 0; k < arraySize; k++) {
-            Color color = (k == j - 1 || k == minIndex) ? RED : BLUE; // Highlight the elements being compared
-            DrawRectangle(k * (screenWidth / arraySize), screenHeight - array[k], (screenWidth / arraySize) - 2, array[k], color);
-        }
+		// Update and draw pixel positions using recursion
+		UpdateAndDrawPixels(pixels, time, amplitude, movementSpeed, periodicTime, 0);
 
-        // Draw the sorting status
-        if (sorted) {
-            DrawText("Array is sorted!", screenWidth / 2 - 100, 20, 20, DARKGREEN);
-        }
-        else if (sortingPaused) {
-            DrawText("Press SPACE to start sorting", screenWidth / 2 - 130, 20, 20, DARKGRAY);
-        }
-        else {
-            DrawText("Sorting...", screenWidth / 2 - 70, 20, 20, DARKGRAY);
-        }
+		DrawText("Wave pattern simulation", 10, 10, 20, LIGHTGRAY);
 
-        DrawText(currentAlgorithm == BUBBLE_SORT ? "Algorithm: Bubble Sort (Press 1)" : "Algorithm: Selection Sort (Press 2)", 10, 10, 20, BLACK);
-        DrawText("Press R to generate new array", 10, 40, 20, BLACK);
-        EndDrawing();
-    }
+		EndDrawing();
+	}
 
-    CloseWindow();
+	CloseWindow();  // Close window and OpenGL context
 
-    return 0;
+	return 0;
 }
+

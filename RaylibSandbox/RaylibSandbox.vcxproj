@@ -136,6 +136,7 @@
     <ClCompile Include="RaylibSandbox.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Notes.md" />
     <None Include="README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
