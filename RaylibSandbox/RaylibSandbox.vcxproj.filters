@@ -16,6 +16,9 @@
     <Filter Include="Header Files\Drawing">
       <UniqueIdentifier>{01a37f5e-f6b0-4ae2-b645-c3e8c9501301}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Bag">
+      <UniqueIdentifier>{253ac52a-22b1-458b-8ade-78521df37602}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RaylibSandbox.cpp">
@@ -29,5 +32,16 @@
     <None Include="Notes.md">
       <Filter>Resource Files</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="IBag.h">
+      <Filter>Header Files\Bag</Filter>
+    </ClInclude>
+    <ClInclude Include="Bag.hpp">
+      <Filter>Header Files\Bag</Filter>
+    </ClInclude>
+    <ClInclude Include="BagUtility.hpp">
+      <Filter>Header Files\Bag</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

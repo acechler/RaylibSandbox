@@ -139,6 +139,11 @@
     <None Include="Notes.md" />
     <None Include="README.md" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Bag.hpp" />
+    <ClInclude Include="BagUtility.hpp" />
+    <ClInclude Include="IBag.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
